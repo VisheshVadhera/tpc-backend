@@ -4,6 +4,8 @@ exports.up = function (knex, Promise) {
         table.string('firstName');
         table.string('lastName');
         table.string('accessToken');
+        table.string('email');
+        table.string('profilePictureUrl');
     });
 };
 
