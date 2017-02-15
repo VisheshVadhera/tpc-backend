@@ -1,0 +1,23 @@
+{
+  "port": 3000,
+  "ip": "127.0.0.1",
+  "seedDB": false,
+  "apiPrefix": "/api/v1",
+  "db": {
+    "client": "mysql",
+    "connection": {
+      "host": "127.0.0.1",
+      "user": "user",
+      "password": "password",
+      "database": "tpc",
+      "charset": "utf8"
+    },
+    "pool": {
+      "min": 2,
+      "max": 10
+    },
+    "migrations": {
+      "tableName": "knex_migrations"
+    }
+  }
+}
