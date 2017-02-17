@@ -38,7 +38,7 @@ exports.emailLogin = function (req, res) {
         })
         .then(function (accessToken) {
 
-            var hash = crypto.createHmac('sha256', config.get('keys.accountkit.appSecret'))
+            var hash = crypto.createHmac('sha256', config.get('keys.accountKit.appSecret'))
                 .update(accessToken)
                 .digest('hex');
 
