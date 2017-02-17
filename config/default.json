@@ -19,5 +19,11 @@
     "migrations": {
       "tableName": "knex_migrations"
     }
+  },
+  "keys":{
+    "accountKit":{
+      "appId": "appId",
+      "appSecret": "appSecret"
+    }
   }
 }
