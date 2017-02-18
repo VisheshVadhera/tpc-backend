@@ -1,16 +1,13 @@
+
 var config = require('config');
 
 var knex = require('knex') ({
-  client: 'mysql',
-  connection: config.get('database.mysql')
+  client: config.get('db.client'),
+  connection: config.get('db.connection')
 });
 
 var bookshelf = require('bookshelf')(knex);
 
-bookshelf.plugin('virtuals');
 bookshelf.plugin('visibility');
-bookshelf.plugin('pagination');
-
-bookshelf.plugin(require('bookshelf-modelbase').pluggable);
 
 module.exports = bookshelf;

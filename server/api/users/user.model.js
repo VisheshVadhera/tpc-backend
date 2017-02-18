@@ -10,4 +10,6 @@ var User = bookshelf.Model.extend({
     tableName: 'user',
     hasTimeStamps: timestampsName,
     hidden: timestampsName
-})
+});
+
+module.exports = User;

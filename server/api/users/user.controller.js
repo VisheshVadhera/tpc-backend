@@ -6,6 +6,7 @@ var rp = require('request-promise');
 var config = require('config');
 var Promise = require('bluebird');
 var jwt = Promise.promisifyAll(require('jsonwebtoken'));
+var crypto = require('crypto');
 
 var User = require('./user.model');
 var errorHandler = require('../../helpers/errorHandler');
@@ -34,6 +35,8 @@ exports.emailLogin = function (req, res) {
 
             if (!accountKitResponse.access_token) {
                 //Error
+                res.status(500);
+                return null;
             } else if (!accountKitResponse.error) {
                 return accountKitResponse.access_token;
             }
@@ -62,33 +65,43 @@ exports.emailLogin = function (req, res) {
 
                     if (!userDetailsResponse.error) {
                         return userDetailsResponse.email.address;
+                    }else{
+                        res.status(500);
+                        return null;
                     }
 
                 })
         })
         .then(function (email) {
             return User
-                .fetch({
+                .forge({
                     email: email
                 })
-        })
-        .then(function (user) {
+                .fetch()
+                .then(function (user) {
 
-            if (user) {
-                return generateJwt(user.get('id')).then(saveAccessToken);
-            } else {
+                    if (user) {
+                        return generateJwt(user.get('id'))
+                            .then(function (accessToken) {
+                                return saveAccessToken(accessToken, user);
+                            });
+                    } else {
 
-                return User
-                    .forge({
-                        firstName: ' ',
-                        lastName: ' ',
-                        email: email
-                    })
-                    .save()
-                    .then(function (user) {
-                        return generateJwt(user.get('id')).then(saveAccessToken);
-                    })
-            }
+                        return User
+                            .forge({
+                                firstName: ' ',
+                                lastName: ' ',
+                                email: email
+                            })
+                            .save()
+                            .then(function (user) {
+                                return generateJwt(user.get('id'))
+                                    .then(function (accessToken) {
+                                        return saveAccessToken(accessToken, user);
+                                    });
+                            })
+                    }
+                })
         })
         .then(function (accessToken) {
             res.status(200).json({accessToken: accessToken});
@@ -99,8 +112,7 @@ exports.emailLogin = function (req, res) {
         })
 }
 
-
-function saveAccessToken(accessToken) {
+function saveAccessToken(accessToken, user) {
     return user.save({
         accessToken: accessToken
     })
