@@ -23,7 +23,9 @@
   "keys":{
     "accountKit":{
       "appId": "appId",
-      "appSecret": "appSecret"
+      "appSecret": "appSecret",
+      "accessTokenBaseUrl": "http://baseUrl",
+      "accessTokenValidationUBaseUrl": "http://validationUrl"
     },
     "jwt": {
       "jwtSecret": "thisIsTheSecret",

@@ -21,7 +21,7 @@ exports.emailLogin = function (req, res) {
         + config.get('keys.accountKit.appSecret');
 
     var options = {
-        uri: 'https://graph.accountkit.com/v1.1/access_token',
+        uri: config.get('keys.accountKit.accessTokenBaseUrl'),
         qs: {
             grant_type: 'authorization_code',
             code: authorizationCode,
@@ -48,7 +48,7 @@ exports.emailLogin = function (req, res) {
                 .digest('hex');
 
             var options = {
-                uri: 'https://graph.accountkit.com/v1.1/me',
+                uri: config.get('keys.accountKit.accessTokenValidationUBaseUrl'),
                 qs: {
                     access_token: accessToken,
                     appsecret_proof: hash
