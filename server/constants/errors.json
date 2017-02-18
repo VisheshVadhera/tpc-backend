@@ -1,0 +1,5 @@
+{
+  "api": {
+    "SERVER_ERROR": "Unable to fulfill request. Please try again."
+  }
+}

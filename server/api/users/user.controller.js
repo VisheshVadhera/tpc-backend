@@ -9,8 +9,10 @@ var jwt = Promise.promisifyAll(require('jsonwebtoken'));
 var crypto = require('crypto');
 
 var User = require('./user.model');
-var errorHandler = require('../../helpers/errorHandler');
 
+var errorHandler = require('../../helpers/errorHandler');
+var errorFactory = require('../../helpers/errorFactory');
+var errorStrings = require("../../constants/errors.json");
 
 exports.emailLogin = function (req, res) {
 
@@ -35,7 +37,7 @@ exports.emailLogin = function (req, res) {
 
             if (!accountKitResponse.access_token) {
                 //Error
-                res.status(500);
+                errorHandler(res, errorFactory.createServerError(errorStrings.api.SERVER_ERROR));
                 return null;
             } else if (!accountKitResponse.error) {
                 return accountKitResponse.access_token;
@@ -65,11 +67,10 @@ exports.emailLogin = function (req, res) {
 
                     if (!userDetailsResponse.error) {
                         return userDetailsResponse.email.address;
-                    }else{
-                        res.status(500);
+                    } else {
+                        errorHandler(res, errorFactory.createServerError(errorStrings.api.SERVER_ERROR));
                         return null;
                     }
-
                 })
         })
         .then(function (email) {
