@@ -24,6 +24,10 @@
     "accountKit":{
       "appId": "appId",
       "appSecret": "appSecret"
+    },
+    "jwt": {
+      "jwtSecret": "thisIsTheSecret",
+      "expiresIn": "1m"
     }
   }
 }

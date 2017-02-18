@@ -4,8 +4,11 @@
 
 var rp = require('request-promise');
 var config = require('config');
+var Promise = require('bluebird');
+var jwt = Promise.promisifyAll(require('jsonwebtoken'));
 
 var User = require('./user.model');
+var errorHandler = require('../../helpers/errorHandler');
 
 
 exports.emailLogin = function (req, res) {
@@ -24,7 +27,7 @@ exports.emailLogin = function (req, res) {
             access_token: accessTokenParamVal
         },
         json: true
-    }
+    };
 
     rp(options)
         .then(function (accountKitResponse) {
@@ -34,7 +37,6 @@ exports.emailLogin = function (req, res) {
             } else if (!accountKitResponse.error) {
                 return accountKitResponse.access_token;
             }
-
         })
         .then(function (accessToken) {
 
@@ -65,16 +67,55 @@ exports.emailLogin = function (req, res) {
                 })
         })
         .then(function (email) {
-
             return User
-                .forge({
-                    firstName: ' ',
-                    lastName: ' ',
+                .fetch({
                     email: email
                 })
-                .save();
+        })
+        .then(function (user) {
+
+            if (user) {
+                return generateJwt(user.get('id')).then(saveAccessToken);
+            } else {
+
+                return User
+                    .forge({
+                        firstName: ' ',
+                        lastName: ' ',
+                        email: email
+                    })
+                    .save()
+                    .then(function (user) {
+                        return generateJwt(user.get('id')).then(saveAccessToken);
+                    })
+            }
+        })
+        .then(function (accessToken) {
+            res.status(200).json({accessToken: accessToken});
+            return null;
         })
         .catch(function (err) {
+            return errorHandler(res, err);
+        })
+}
 
-        });
+
+function saveAccessToken(accessToken) {
+    return user.save({
+        accessToken: accessToken
+    })
+        .then(function (user) {
+            return accessToken;
+        })
+}
+
+
+function generateJwt(userId) {
+    return jwt.signAsync({
+            userId: userId
+        },
+        config.get("keys.jwt.jwtSecret"),
+        {
+            expiresIn: config.get("keys.jwt.expiresIn")
+        })
 }
