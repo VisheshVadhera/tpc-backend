@@ -7,6 +7,8 @@ var config = require('config');
 var Promise = require('bluebird');
 var jwt = Promise.promisifyAll(require('jsonwebtoken'));
 var crypto = require('crypto');
+var _ = require('lodash');
+
 
 var User = require('./user.model');
 
@@ -111,6 +113,27 @@ exports.emailLogin = function (req, res) {
         .catch(function (err) {
             return errorHandler(res, err);
         })
+};
+
+exports.updateUser = function (req, res) {
+
+    var params = _.pick(req.body, ['firstName', 'lastName']);
+
+    User
+        .where({id: req.params.id})
+        .fetch({require: true})
+        .then(function (user) {
+            return user
+                .save(params);
+        })
+        .then(function (user) {
+            res.status(200).json(user);
+        })
+        .catch(function (err) {
+            return errorHandler(res, err);
+        })
+
+
 }
 
 function saveAccessToken(accessToken, user) {
